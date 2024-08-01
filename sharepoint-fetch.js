@@ -5,36 +5,10 @@ import qs from 'qs';
 import XLSX from 'xlsx';
 import { generateAccessToken } from './workflow.js';
 
-let accessToken = process.env.GRAPH_API_ACCESS_TOKEN;
-// Function to get the access token
-const getAccessToken = async () => {
-    const tenantId = process.env.TENANTID; // Replace with your tenant ID
-    const clientId = process.env.CLIENTID; // Replace with your client ID
-    const clientSecret = process.env.CLIENTSECRET; // Replace with your client secret
-    const scope = 'https://graph.microsoft.com/.default';
-    const url = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`;
 
-    const requestBody = {
-        client_id: clientId,
-        client_secret: clientSecret,
-        scope: scope,
-        grant_type: 'client_credentials'
-    };
-
-    try {
-        const response = await axios.post(url, qs.stringify(requestBody), {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
-        return response.data.access_token;
-    } catch (error) {
-        console.error('Error fetching access token', error);
-    }
-};
 
 // Function to get Drive ID
-const getDriveId = async () => {
+const getDriveId = async (accessToken) => {
     const url = 'https://graph.microsoft.com/v1.0/me/drive';
 
     try {
@@ -52,8 +26,8 @@ const getDriveId = async () => {
 };
 
 // Function to get Item ID
-const getItemId = async (fileName) => {
-    const driveId = await getDriveId();
+const getItemId = async (fileName,accessToken) => {
+    const driveId = await getDriveId(accessToken);
     const url = `https://graph.microsoft.com/v1.0/me/drive/root/search(q='${fileName}')`;
 
     try {
@@ -72,7 +46,7 @@ const getItemId = async (fileName) => {
 };
 
 // Function to get file content
-const getFileContent = async (itemId) => {
+const getFileContent = async (itemId,accessToken) => {
     const url = `https://graph.microsoft.com/v1.0/me/drive/items/${itemId}/content`;
 
     try {
@@ -98,11 +72,11 @@ const getFileContent = async (itemId) => {
 
 
 // Main function to execute the workflow
-export const getDataFromSharePoint = async () => {
+export const getDataFromSharePoint = async (token) => {
     const fileName = 'Employee.xlsx'; // Replace with your file name
     try {
-        const itemId = await getItemId(fileName);
-        const content = await getFileContent(itemId);
+        const itemId = await getItemId(fileName,token);
+        const content = await getFileContent(itemId,token);
         return content;
     } catch (error) {
         console.error('Error in workflow', error);

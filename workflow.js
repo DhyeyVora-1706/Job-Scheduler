@@ -9,9 +9,31 @@ const clientSecret = '6LM8Q~I.eabZMrXRY7v5y4kpl6gX0qaCbtGlCbZL';
 const teamId = '1434253a-d09e-432d-b3b3-b902f07927f3';
 const channelId = '19:rzs-cne6AtTfc0JmbaX5f2TZJR6lbOqu2Sv-k_dur6s1@thread.tacv2';
 
+const getISTDateTime = () => {
+    // Create a date object
+    const date = new Date();
+    
+    // Define options for formatting
+    const options = {
+        timeZone: 'Asia/Kolkata', // IST time zone
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false // Use 24-hour format
+    };
+
+    // Format the date object according to IST
+    const formatter = new Intl.DateTimeFormat('en-IN', options);
+    return formatter.format(date);
+};
+
 function generateTableHTML(data)
 {
-    let tableHtml = `<h4>Data Captured as of ${new Date().toLocaleString()}</h4> <br><br><hr/>`;
+    let ISTDateTime = getISTDateTime();
+    let tableHtml = `<h4>Data Captured as of ${ISTDateTime}</h4> <br><br><hr/>`;
     tableHtml += '<table border="1" style="border-collapse: collapse;">';
     tableHtml+=` <thead>
             <tr>
@@ -92,10 +114,9 @@ export async function generateAccessToken() {
 
 
 
-export async function sendMessageToTeams(dataSent) {
+export async function sendMessageToTeams(dataSent,accessToken) {
     try{
     let HTMLoutput = generateTableHTML(dataSent);
-    const accessToken = process.env.GRAPH_API_ACCESS_TOKEN;
     const response = await fetch(`https://graph.microsoft.com/v1.0/teams/${teamId}/channels/${channelId}/messages`, {
         method: 'POST',
         headers: {

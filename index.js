@@ -7,17 +7,31 @@ import {getDataFromSharePoint} from './sharepoint-fetch.js'
 
 
 const app = express();
+let token;
 
 app.get('/', async (req, res) => {
-    await executeJob();
+    const authorizationHeader = req.headers.authorization;
+
+    if (!authorizationHeader) {
+        return res.status(401).send('Authorization header is missing');
+    }
+
+    // Extract the bearer token
+    token = authorizationHeader.split(' ')[1];
+   
+    if (!token) {
+        return res.status(401).send('Bearer token is missing');
+    }    
+    // process.env.GRAPH_API_ACCESS_TOKEN = token;
+    await executeJob(token);
     return res.status(200).send("OK");
 });
 
-export async function executeJob()
+export async function executeJob(token)
 {
-    const data = await fetchExcelDataFromSharePoint();
+    const data = await fetchExcelDataFromSharePoint(token);
     const filteredData = filterData(data);
-    await sendMessageToTeams(filteredData);
+    await sendMessageToTeams(filteredData,token);
 }
 
 // async function fetchExcelDataFromS3(){
@@ -30,9 +44,9 @@ export async function executeJob()
 //     }
 // }
 
-async function fetchExcelDataFromSharePoint(){
+async function fetchExcelDataFromSharePoint(token){
     try{      
-       const data = await getDataFromSharePoint();
+       const data = await getDataFromSharePoint(token);
        return data;
     }catch(err)
     {
