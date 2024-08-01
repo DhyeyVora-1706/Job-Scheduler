@@ -2,11 +2,16 @@ import express from 'express';
 import {getObject} from './aws-data-fetch.js';
 import { sendMessageToTeams } from './workflow.js';
 import xlsx from 'xlsx';
-import './scheduler.js';
+// import './scheduler.js';
 import {getDataFromSharePoint} from './sharepoint-fetch.js'
 
 
 const app = express();
+
+app.get('/', async (req, res) => {
+    await executeJob();
+    return res.status(200).send("OK");
+});
 
 export async function executeJob()
 {
@@ -63,7 +68,7 @@ function filterData(data) {
 
 app.listen(4000,async () =>{
     console.log("Server is running on port 4000");
-    await executeJob();
+    // await executeJob();
 })
 
 // function parseDate(dateString)
