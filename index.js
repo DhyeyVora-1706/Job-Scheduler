@@ -1,5 +1,4 @@
 import express from 'express';
-import {getObject} from './aws-data-fetch.js';
 import { sendMessageToTeams } from './workflow.js';
 import xlsx from 'xlsx';
 // import './scheduler.js';
