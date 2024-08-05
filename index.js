@@ -117,8 +117,8 @@ function filterData(data,days,direction) {
     }
 }
 
-app.listen(4000,async () =>{
-    console.log("Server is running on port 4000");
+app.listen(80,async () =>{
+    console.log("Server is running on port 80");
 })
 
 
