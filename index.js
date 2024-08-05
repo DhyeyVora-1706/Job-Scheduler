@@ -98,7 +98,7 @@ app.listen(4000,async () =>{
 //         sevenDaysFromNow.setDate(today.getDate() - 7)
 
 //         const filteredData = data.filter((item) => {
-//             const itemDate = parseDate(item.Date)
+//             const itemDate = parseDate(item['Hire Date'])
 //             return itemDate <= sevenDaysFromNow
 //         });
 //         return filteredData;
