@@ -69,7 +69,7 @@ function filterData(data) {
         sevenDaysFromNow.setDate(today.getDate() - 7);
 
         const filteredData = data.filter((item) => {
-            const itemDate = parseDate(item.Hire_Date);
+            const itemDate = parseDate(item['Hire Date']);
             return itemDate <= sevenDaysFromNow;
         });
 
@@ -84,39 +84,5 @@ app.listen(4000,async () =>{
     // await executeJob();
 })
 
-// function parseDate(dateString)
-// {
-//     const [day,month,year] = dateString.split("/");
-//     return new Date(year,month-1,day);
-// }
-
-// function filterData(data)
-// {
-//     try{
-//         const today = new Date();
-//         const sevenDaysFromNow = new Date();
-//         sevenDaysFromNow.setDate(today.getDate() - 7)
-
-//         const filteredData = data.filter((item) => {
-//             const itemDate = parseDate(item['Hire Date'])
-//             return itemDate <= sevenDaysFromNow
-//         });
-//         return filteredData;
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
-
-// async function jsonToExcel(jsonData)
-// {
-//     const worksheet = xlsx.utils.json_to_sheet(jsonData);
-//     const workbook = xlsx.utils.book_new();
-//     xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
-
-//     const fileName = 'filteredData.xlsx';
-//     const filepath = "./"+fileName;
-//     xlsx.writeFile(workbook, filepath);
-// }
 
 
