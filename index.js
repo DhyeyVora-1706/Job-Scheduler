@@ -44,7 +44,7 @@ app.get('/', async (req, res) => {
         return res.status(200).send("Data Sent teams channel successfully");
     }catch(err)
     {
-        return res.status(500).send("Internal Server Error");
+        throw err;
     }
 });
 
