@@ -1,9 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios';
-import qs from 'qs';
 import XLSX from 'xlsx';
-import { generateAccessToken } from './workflow.js';
+
 
 
 
@@ -25,32 +24,6 @@ const getDriveId = async (accessToken) => {
     }
 };
 
-// Function to get Item ID
-const getItemId = async (fileName,accessToken) => {
-    const driveId = await getDriveId(accessToken);
-    const url = `https://graph.microsoft.com/v1.0/me/drive/root/search(q='${fileName}')`;
-
-    try {
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        });
-        
-        // const item = response.data.value[0];
-        
-
-        const files = response.data.value;
-        const exactMatchFile = files.find(file => file.name === fileName);
-        const itemId = exactMatchFile.id;
-
-
-        console.log(`Item ID: ${itemId}`);
-        return itemId;
-    } catch (error) {
-        throw new Error('Error fetching item ID',error);
-    }
-};
 
 // Function to get file content
 const getFileContent = async (itemId,accessToken) => {
@@ -79,10 +52,15 @@ const getFileContent = async (itemId,accessToken) => {
 
 // Main function to execute the workflow
 export const getDataFromSharePoint = async (token) => {
+    const folderName = 'Scheduler';
     const fileName = 'Employees.xlsx'; // Replace with your file name
     try {
-        const itemId = await getItemId(fileName,token);
-        const content = await getFileContent(itemId,token);
+        // const itemId = await getItemId(fileName,token);
+        // const content = await getFileContent(itemId,token);
+        // return content;
+        const folderId = await getFolderIdByName(folderName, token);
+        const fileId = await getFileIdByName(folderId, fileName, token);
+        const content = await getFileContent(fileId, token);
         return content;
     } catch (error) {
         
@@ -90,3 +68,48 @@ export const getDataFromSharePoint = async (token) => {
     }
 };
 
+const getFolderIdByName = async (folderName, accessToken) => {
+    const url = `https://graph.microsoft.com/v1.0/me/drive/root/children`;
+
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+
+        const folder = response.data.value.find(item => item.name === folderName && item.folder);
+        if (!folder) {
+            throw new Error(`Folder ${folderName} not found`);
+        }
+        console.log(`Folder ID: ${folder.id}`);
+        return folder.id;
+    } catch (error) {
+        console.error('Error fetching folder ID:', error);
+        throw error;
+    }
+};
+
+
+const getFileIdByName = async (folderId, fileName, accessToken) => {
+    const url = `https://graph.microsoft.com/v1.0/me/drive/items/${folderId}/children`;
+
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+
+        const file = response.data.value.find(item => item.name === fileName && item.file);
+        if (!file) {
+            throw new Error(`File ${fileName} not found in folder ${folderId}`);
+        }
+        
+        console.log(`File ID: ${file.id}`);
+        return file.id;
+    } catch (error) {
+        console.error('Error fetching file ID:', error);
+        throw error;
+    }
+};
