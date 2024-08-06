@@ -21,7 +21,7 @@ const getDriveId = async (accessToken) => {
         console.log(`Drive ID: ${driveId}`);
         return driveId;
     } catch (error) {
-        console.error('Error fetching drive ID', error);
+        throw new Error('Error fetching drive ID', error);
     }
 };
 
@@ -36,12 +36,19 @@ const getItemId = async (fileName,accessToken) => {
                 Authorization: `Bearer ${accessToken}`
             }
         });
-        const item = response.data.value[0];
-        const itemId = item.id;
+        
+        // const item = response.data.value[0];
+        
+
+        const files = response.data.value;
+        const exactMatchFile = files.find(file => file.name === fileName);
+        const itemId = exactMatchFile.id;
+
+
         console.log(`Item ID: ${itemId}`);
         return itemId;
     } catch (error) {
-        console.error('Error fetching item ID', error);
+        throw new Error('Error fetching item ID',error);
     }
 };
 
@@ -65,7 +72,6 @@ const getFileContent = async (itemId,accessToken) => {
         console.log('File content parsed successfully');
         return dataObjects;
     } catch (error) {
-        console.error('Error fetching file content');
         throw error;
     }
 };
@@ -73,13 +79,14 @@ const getFileContent = async (itemId,accessToken) => {
 
 // Main function to execute the workflow
 export const getDataFromSharePoint = async (token) => {
-    const fileName = 'Employee.xlsx'; // Replace with your file name
+    const fileName = 'Employees.xlsx'; // Replace with your file name
     try {
         const itemId = await getItemId(fileName,token);
         const content = await getFileContent(itemId,token);
         return content;
     } catch (error) {
-        console.error('Error in workflow', error);
+        
+        throw new Error(error);
     }
 };
 

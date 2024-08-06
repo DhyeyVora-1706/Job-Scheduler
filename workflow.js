@@ -1,13 +1,16 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import 'node-fetch';
 import { ClientSecretCredential } from '@azure/identity';
 import 'node-fetch';
 import querystring from 'querystring';
 
-const tenantId = '6ba04439-8b0e-43ee-ad26-c2ac9ef9e765';
-const clientId = 'ba1c4221-5aec-4b7b-8d82-ba7a8611377f';
-const clientSecret = '6LM8Q~I.eabZMrXRY7v5y4kpl6gX0qaCbtGlCbZL';
-const teamId = '1434253a-d09e-432d-b3b3-b902f07927f3';
-const channelId = '19:rzs-cne6AtTfc0JmbaX5f2TZJR6lbOqu2Sv-k_dur6s1@thread.tacv2';
+const tenantId = process.env.TENANTID;
+const clientId = process.env.CLIENTID;
+const clientSecret = process.env.CLIENTSECRET;
+const teamId = process.env.TEAMID;
+const channelId = process.env.CHANNELID;
+
 
 const getISTDateTime = () => {
     // Create a date object
@@ -39,7 +42,7 @@ function generateTableHTML(data)
             <tr>
                 <th style="width: 10%;">Employee ID</th>
                 <th style="width: 13%;">Employee Name</th>
-                <th style="width: 10%;">Hire Date</th>
+                <th style="width: 10%;">Availability Date</th>
                 <th style="width: 12%;">Work Location</th>
                 <th style="width: 10%;">Designation</th>
                 <th style="width: 15%;">Advanced Level Skills</th>
@@ -58,7 +61,7 @@ function generateTableHTML(data)
                     ${element['Employee Name']}
                 </td>
                 <td>
-                    ${element['Hire_Date']}
+                    ${element['Available Start Date']}
                 </td>
                 <td>
                     ${element['Work Location']}
@@ -139,7 +142,7 @@ export async function sendMessageToTeams(dataSent,accessToken) {
     }
     catch(err)
     {
-        console.log(err);
+        throw new Error(err);
     }
 }
 
